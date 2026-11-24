@@ -1,16 +1,13 @@
 package io.github.monun.speculation.paper
 
-import io.github.monun.heartbeat.coroutines.Heartbeat
 import io.github.monun.speculation.game.MovementCause
 import io.github.monun.speculation.game.event.*
 import io.github.monun.speculation.game.zone.ZoneFestival
 import io.github.monun.speculation.game.zone.ZoneJail
 import io.github.monun.speculation.paper.util.broadcast
 import io.github.monun.speculation.paper.util.playSound
-import io.github.monun.tap.effect.playFirework
-import io.github.monun.tap.protocol.PacketSupport
-import io.github.monun.tap.trail.TrailSupport
-import kotlinx.coroutines.Dispatchers
+import io.github.monun.speculation.paper.util.playFirework
+import io.github.monun.speculation.paper.util.trail
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -21,6 +18,7 @@ import net.kyori.adventure.title.Title
 import org.bukkit.*
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Firework
+import org.bukkit.entity.Item
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import java.time.Duration
@@ -64,7 +62,7 @@ class GameEventListener(private val process: PaperGameProcess) {
         val paperPiece = piece.attachment<PaperPiece>()
         val paperZoneTo = zoneTo.attachment<PaperZone>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             val from = paperPiece.stand.location
             val to = paperZoneTo.nextPieceLocation()
             val distance = from.distance(to)
@@ -85,7 +83,7 @@ class GameEventListener(private val process: PaperGameProcess) {
                     add(vector.clone().multiply(parabolaX))
                     y += parabolaY * distance / 3.0
                 }
-                paperPiece.stand.moveTo(location)
+                paperPiece.stand.teleport(location)
             }
 
             paperPiece.playStepSound()
@@ -100,7 +98,7 @@ class GameEventListener(private val process: PaperGameProcess) {
         val zone = event.destination
         val paperZone = zone.attachment<PaperZone>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             paperZone.playLeaveEffect(event.piece.attachment())
         }
     }
@@ -109,7 +107,7 @@ class GameEventListener(private val process: PaperGameProcess) {
         val zone = event.from
         val paperZone = zone.attachment<PaperZone>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             paperZone.playArriveEffect(event.piece.attachment())
         }
     }
@@ -121,7 +119,7 @@ class GameEventListener(private val process: PaperGameProcess) {
         val paperProperty = property.attachment<PaperZoneProperty>()
         val paperOwner = owner.attachment<PaperPiece>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             paperProperty.playUpgradeEffect(paperOwner, event.level)
             paperProperty.updateSlots()
             paperProperty.updateTolls()
@@ -133,7 +131,7 @@ class GameEventListener(private val process: PaperGameProcess) {
 
         val paperProperty = property.attachment<PaperZoneProperty>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             paperProperty.updateSlots()
             paperProperty.updateTolls()
 
@@ -162,7 +160,7 @@ class GameEventListener(private val process: PaperGameProcess) {
         val property = event.property
         val paperProperty = property.attachment<PaperZoneProperty>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             paperProperty.updateSlots()
             paperProperty.updateTolls()
         }
@@ -177,7 +175,7 @@ class GameEventListener(private val process: PaperGameProcess) {
         val paperPiece = piece.attachment<PaperPiece>()
         val paperZone = zone.attachment<PaperZone>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             broadcastTransfer(Component.text("[${paperZone.name}]"), paperPiece.name, event.amount)
 
             val box = paperZone.box
@@ -185,29 +183,19 @@ class GameEventListener(private val process: PaperGameProcess) {
             val xWidth = box.widthX
             val zWidth = box.widthZ
 
-            val fes = process.fakeEntityServer
             val emeralds = List(count) {
                 val loc = point.clone().apply {
                     x += Random.nextDouble() * xWidth
                     z += Random.nextDouble() * zWidth
                 }
-                fes.spawnItem(loc, ItemStack(Material.EMERALD)).apply {
-                    broadcast(
-                        PacketSupport.entityVelocity(
-                            bukkitEntity.entityId,
-                            Vector(0.0, 0.25 + Random.nextDouble() * 0.5, 0.0)
-                        )
-                    )
-                }
+                spawnEmerald(loc, Vector(0.0, 0.25 + Random.nextDouble() * 0.5, 0.0))
             }
 
             delay(1000L)
 
-            val standId = paperPiece.stand.bukkitEntity.entityId
             val standLoc = paperPiece.stand.location
             val prevScore = paperPiece.score
             emeralds.forEachIndexed { index, emerald ->
-                emerald.broadcastImmediately(PacketSupport.takeItem(emerald.bukkitEntity.entityId, standId, 1))
                 standLoc.playSound(Sound.ENTITY_ITEM_PICKUP, 1.0F)
                 emerald.remove()
                 paperPiece.score = prevScore + amount * (index + 1) / count
@@ -222,7 +210,7 @@ class GameEventListener(private val process: PaperGameProcess) {
         val paperPiece = piece.attachment<PaperPiece>()
         val count = max(1, sqrt(event.amount.toDouble()).toInt())
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             paperPiece.updateScore(piece.balance)
             broadcastTransfer(
                 paperPiece.name,
@@ -234,13 +222,8 @@ class GameEventListener(private val process: PaperGameProcess) {
 
             location.playSound(Sound.BLOCK_CHAIN_PLACE, 0.1F)
 
-            val fes = process.fakeEntityServer
             val emeralds = List(count) {
-                fes.spawnItem(location, ItemStack(Material.EMERALD)).apply {
-                    broadcast {
-                        PacketSupport.entityVelocity(bukkitEntity.entityId, bukkitEntity.velocity)
-                    }
-                }
+                spawnEmerald(location, Vector(0.0, 0.15, 0.0))
             }
 
             process.scope.launch {
@@ -271,29 +254,22 @@ class GameEventListener(private val process: PaperGameProcess) {
         val paperPiece = piece.attachment<PaperPiece>()
         val paperReceiver = receiver.attachment<PaperPiece>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             paperPiece.updateScore(piece.balance)
             broadcastTransfer(paperPiece.name, paperReceiver.name, amount)
 
             val location = paperPiece.stand.location.apply { y += 1.0 }
             location.playSound(Sound.BLOCK_CHAIN_PLACE, 0.1F)
 
-            val fes = process.fakeEntityServer
             val emeralds = List(count) {
-                fes.spawnItem(location, ItemStack(Material.EMERALD)).apply {
-                    broadcast {
-                        PacketSupport.entityVelocity(bukkitEntity.entityId, bukkitEntity.velocity)
-                    }
-                }
+                spawnEmerald(location, Vector(0.0, 0.15, 0.0))
             }
 
             delay(1000L)
 
-            val standId = paperReceiver.stand.bukkitEntity.entityId
             val standLoc = paperReceiver.stand.location
             val prevScore = paperReceiver.score
             emeralds.forEachIndexed { index, emerald ->
-                emerald.broadcastImmediately(PacketSupport.takeItem(emerald.bukkitEntity.entityId, standId, 1))
                 standLoc.playSound(Sound.ENTITY_ITEM_PICKUP, 1.0F)
                 emerald.remove()
                 paperReceiver.score = prevScore + amount * (index + 1) / count
@@ -306,7 +282,7 @@ class GameEventListener(private val process: PaperGameProcess) {
         val property = event.property
         val paperProperty = property.attachment<PaperZoneProperty>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             paperProperty.playClearEffect()
             paperProperty.updateSlots()
             paperProperty.updateTolls()
@@ -319,7 +295,7 @@ class GameEventListener(private val process: PaperGameProcess) {
 
         val paperPiece = piece.attachment<PaperPiece>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             Bukkit.getServer().showTitle(
                 Title.title(
                     paperPiece.name,
@@ -327,7 +303,7 @@ class GameEventListener(private val process: PaperGameProcess) {
                         Component.text(betting)
                             .color(NamedTextColor.DARK_GREEN)
                     ),
-                    Title.Times.of(
+                    Title.Times.times(
                         Duration.ofMillis(250),
                         Duration.ofSeconds(2),
                         Duration.ofMillis(250)
@@ -357,7 +333,7 @@ class GameEventListener(private val process: PaperGameProcess) {
             }
         }.build()
 
-        val times = Title.Times.of(
+        val times = Title.Times.times(
             Duration.ofMillis(250),
             Duration.ofSeconds(2),
             Duration.ofMillis(250)
@@ -374,7 +350,7 @@ class GameEventListener(private val process: PaperGameProcess) {
             times
         )
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             Bukkit.getOnlinePlayers().forEach { player ->
                 val playerPiece = process.piece(player)
 
@@ -394,7 +370,7 @@ class GameEventListener(private val process: PaperGameProcess) {
 
         val paperPiece = piece.attachment<PaperPiece>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             val titleText = paperPiece.name.append(Component.text("의 차례"))
             var subtitleText = Component.empty()
 
@@ -410,7 +386,7 @@ class GameEventListener(private val process: PaperGameProcess) {
                 Title.title(
                     titleText,
                     subtitleText,
-                    Title.Times.of(
+                    Title.Times.times(
                         Duration.ofMillis(250),
                         Duration.ofSeconds(1),
                         Duration.ofMillis(250)
@@ -418,10 +394,8 @@ class GameEventListener(private val process: PaperGameProcess) {
                 )
             )
 
-            paperPiece.stand.updateMetadata<ArmorStand> {
-                isGlowing = true
-                isSmall = false
-            }
+            paperPiece.stand.isGlowing = true
+            paperPiece.stand.isSmall = false
         }
 
         delay(1500L)
@@ -432,11 +406,9 @@ class GameEventListener(private val process: PaperGameProcess) {
 
         val paperPiece = piece.attachment<PaperPiece>()
 
-        withContext(Dispatchers.Heartbeat) {
-            paperPiece.stand.updateMetadata<ArmorStand> {
-                isGlowing = false
-                isSmall = true
-            }
+        withContext(process.plugin.kolorDispatcher) {
+            paperPiece.stand.isGlowing = false
+            paperPiece.stand.isSmall = true
         }
 
         delay(1500L)
@@ -446,13 +418,13 @@ class GameEventListener(private val process: PaperGameProcess) {
         val piece = event.piece
         val success = event.success
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             if (success) {
                 Bukkit.getServer().showTitle(
                     Title.title(
                         Component.text("탈출 성공!").color(NamedTextColor.AQUA),
                         Component.empty(),
-                        Title.Times.of(
+                        Title.Times.times(
                             Duration.ofMillis(0),
                             Duration.ofSeconds(1),
                             Duration.ofMillis(250)
@@ -463,8 +435,8 @@ class GameEventListener(private val process: PaperGameProcess) {
                 Bukkit.getServer().showTitle(
                     Title.title(
                         Component.text("탈출 실패").color(NamedTextColor.RED),
-                        Component.text("남은 감옥 턴: ${piece.jailCount} / ${ZoneJail.count}"),
-                        Title.Times.of(
+                        Component.text("남은 감옥 턴: ${piece.jailCount} / ${process.game.rules.jailTurns}"),
+                        Title.Times.times(
                             Duration.ofMillis(0),
                             Duration.ofSeconds(1),
                             Duration.ofMillis(250)
@@ -481,7 +453,7 @@ class GameEventListener(private val process: PaperGameProcess) {
         val property = event.property
         val paperProperty = property.attachment<PaperZoneProperty>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             if (event.owner is ZoneFestival) {
                 val locOfFestival = process.zoneFestival.location
                 val locOfProperty = paperProperty.location
@@ -504,8 +476,8 @@ class GameEventListener(private val process: PaperGameProcess) {
                         y += parabolaY * distance / 3.0
                     }
 
-                    TrailSupport.trail(prevLocation, location, 0.2) { world, x, y, z ->
-                        world.spawnParticle(Particle.FIREWORKS_SPARK, x, y, z, 1, 0.0, 0.0, 0.0, 0.1, null, true)
+                    trail(prevLocation, location, 0.2) { world, x, y, z ->
+                        world.spawnParticle(Particle.FIREWORK, x, y, z, 1, 0.0, 0.0, 0.0, 0.1, null, true)
                     }
 
                     prevLocation = location
@@ -521,7 +493,7 @@ class GameEventListener(private val process: PaperGameProcess) {
         val property = event.property
         val paperProperty = property.attachment<PaperZoneProperty>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             paperProperty.updateTolls()
         }
     }
@@ -530,29 +502,34 @@ class GameEventListener(private val process: PaperGameProcess) {
         val piece = event.piece
         val paperPiece: PaperPiece = piece.attachment()
 
-        withContext(Dispatchers.Heartbeat) {
-            paperPiece.stand.location.apply { y += 1.0 }.run {
-                world.playFirework(
-                    x,
-                    y,
-                    z,
-                    FireworkEffect.builder().with(FireworkEffect.Type.BALL).withColor(paperPiece.color.color).build(),
-                )
-            }
+        withContext(process.plugin.kolorDispatcher) {
+            val location = paperPiece.stand.location.apply { y += 1.0 }
+            location.world.playFirework(
+                location,
+                FireworkEffect.builder().with(FireworkEffect.Type.BALL).withColor(paperPiece.color.color).build()
+            )
             paperPiece.stand.remove()
             paperPiece.broadcast(Component.text("파산!"))
             delay(1000L) // 후딜레이
         }
+
     }
 
+    private fun spawnEmerald(location: Location, velocity: Vector): Item =
+        process.entityRegistry.spawn(location, Item::class.java).apply {
+            itemStack = ItemStack(Material.EMERALD)
+            setPickupDelay(Int.MAX_VALUE)
+            this.velocity = velocity
+        }
+
     private suspend fun onGameOver(event: GameOverEvent) {
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             Bukkit.getServer().showTitle(
                 Title.title(
                     Component.text("게임종료").color(NamedTextColor.RED),
                     event.winner?.let { Component.text("우승: ").append(it.attachment<PaperPiece>().name) }
                         ?: Component.empty(),
-                    Title.Times.of(
+                    Title.Times.times(
                         Duration.ofMillis(250),
                         Duration.ofSeconds(5),
                         Duration.ofMillis(250)
@@ -591,7 +568,7 @@ class GameEventListener(private val process: PaperGameProcess) {
                     Title.title(
                         Component.text(author).color(NamedTextColor.AQUA),
                         Component.text(list.joinToString(" ")).color(NamedTextColor.GRAY),
-                        Title.Times.of(
+                        Title.Times.times(
                             Duration.ofMillis(100),
                             Duration.ofSeconds(3),
                             Duration.ofMillis(100)

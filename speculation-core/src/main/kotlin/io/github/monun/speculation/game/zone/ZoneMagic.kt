@@ -95,10 +95,10 @@ sealed interface Magic {
     object Moonwalk : Magic {
         override suspend fun dispatch(zone: ZoneMagic, piece: Piece) {
             val diceResult = piece.request(
-                GameDialogDice(2),
+                GameDialogDice(piece.board.game.rules.moonwalkDiceCount),
                 GameMessage.ROLL_THE_DICE_FOR_MOONWALK
             ) {
-                List(2) {
+                List(piece.board.game.rules.moonwalkDiceCount) {
                     1 + Random.nextInt(6)
                 }
             }
@@ -111,21 +111,21 @@ sealed interface Magic {
     // 싱글: 다음 턴 주사위는 1개를 던짐
     object SingleDice : Magic {
         override suspend fun dispatch(zone: ZoneMagic, piece: Piece) {
-            piece.numberOfDice = 1
+            piece.numberOfDice = piece.board.game.rules.singleDiceCount
         }
     }
 
     // 트리플: 다음 턴 주사위는 3개를 던짐
     object TripleDice : Magic {
         override suspend fun dispatch(zone: ZoneMagic, piece: Piece) {
-            piece.numberOfDice = 3
+            piece.numberOfDice = piece.board.game.rules.tripleDiceCount
         }
     }
 
     // 쿼드러플: 다음 턴 주사위는 4개를 던짐
     object QuadrupleDice : Magic {
         override suspend fun dispatch(zone: ZoneMagic, piece: Piece) {
-            piece.numberOfDice = 4
+            piece.numberOfDice = piece.board.game.rules.quadrupleDiceCount
         }
     }
 
@@ -164,10 +164,10 @@ sealed interface Magic {
     object Pickpocket : Magic {
         override suspend fun dispatch(zone: ZoneMagic, piece: Piece) {
             val diceResult = piece.request(
-                GameDialogDice(1),
+                GameDialogDice(piece.board.game.rules.pickpocketDiceCount),
                 GameMessage.ROLL_THE_DICE
             ) {
-                List(1) {
+                List(piece.board.game.rules.pickpocketDiceCount) {
                     1 + Random.nextInt(6)
                 }
             }

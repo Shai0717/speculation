@@ -14,7 +14,7 @@ import kotlinx.coroutines.*
 import java.util.*
 import kotlin.random.Random
 
-class Game {
+class Game(val rules: GameRules = GameRules()) {
     val board: Board = Board(this)
 
     val dialogAdapter = GameDialogAdapter()
@@ -82,7 +82,7 @@ class Game {
                                 }
                             }
                             // 다음턴 주사위 초기화
-                            piece.numberOfDice = 2
+                            piece.numberOfDice = rules.defaultDiceCount
 
                             piece.zone.onTryLeave(piece, diceResult)
                             piece.moveTo(

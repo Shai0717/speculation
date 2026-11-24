@@ -1,12 +1,14 @@
 import java.security.MessageDigest
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.21"
+    kotlin("jvm") version "2.3.20"
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(16))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
@@ -16,9 +18,9 @@ allprojects {
     }
 
     tasks {
-        withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-            kotlinOptions {
-                jvmTarget = "16"
+        withType<KotlinCompile>().configureEach {
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_25)
             }
         }
     }
@@ -30,7 +32,7 @@ subprojects {
     dependencies {
         implementation(kotlin("stdlib"))
         implementation(kotlin("reflect"))
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
         testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
         testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.2")
@@ -49,11 +51,11 @@ subprojects {
 tasks {
     val resourcepacksFolder = file("resourcepacks")
     val resourcepacksTasks = resourcepacksFolder.listFiles { file -> file.isDirectory }?.map { folder ->
-        create<Zip>("resourcepacksZip-${folder.name}") {
+        register<Zip>("resourcepacksZip-${folder.name}") {
             from(folder)
             include("*")
             include("*/**")
-            archiveFileName.set("${folder.name}.zip")
+            archiveFileName.set(if (folder.name == "speculation") "resourcepack.zip" else "${folder.name}.zip")
             destinationDirectory.set(file("build/libs/"))
 
             doLast {
@@ -66,11 +68,11 @@ tasks {
         }
     }
 
-    create("resourcepacksZip") {
-        dependsOn(resourcepacksTasks)
+    register("resourcepacksZip") {
+        resourcepacksTasks?.forEach { dependsOn(it) }
     }
 
-    create<Zip>("runZip") {
+    register<Zip>("runZip") {
         from(file("run"))
         include("*")
         include("*/**")

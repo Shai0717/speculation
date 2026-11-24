@@ -1,0 +1,76 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "minecraft:custom_model_data",
+    "index": 0,
+    "entries": [
+      {
+        "threshold": 1000,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/dice/monun/dice"
+        }
+      },
+      {
+        "threshold": 1001,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/jail/kinglee2005/jail"
+        }
+      },
+      {
+        "threshold": 1002,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/festival/coroskai/festival"
+        }
+      },
+      {
+        "threshold": 1003,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/portal/degree2121/portal"
+        }
+      },
+      {
+        "threshold": 1004,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/tax/piese1028/tax"
+        }
+      },
+      {
+        "threshold": 1005,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/casino/piese1028/casino"
+        }
+      },
+      {
+        "threshold": 1006,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/eventcard/degree2121/event_card_water"
+        }
+      },
+      {
+        "threshold": 1007,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/eventcard/degree2121/event_card_light"
+        }
+      },
+      {
+        "threshold": 1008,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/eventcard/degree2121/event_card_fire"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "minecraft:item/paper"
+    }
+  }
+}

@@ -1,0 +1,96 @@
+command:
+  permission: speculation.commands
+
+resource-pack:
+  url: ""
+  sha1: ""
+
+game:
+  start-delay-ms: 15000
+  starting-balance: 400
+  default-dice-count: 2
+  start-pass-reward: 100
+  start-arrival-reward: 200
+  gamble-base-bet: 50
+  gamble-bet-increment: 10
+  gamble-dice-count: 3
+  jail-turns: 3
+  moonwalk-dice-count: 2
+  pickpocket-dice-count: 1
+  single-dice-count: 1
+  triple-dice-count: 3
+  quadruple-dice-count: 4
+  property-base-tolls:
+    - 10
+    - 11
+    - 12
+    - 14
+    - 16
+    - 18
+    - 20
+    - 21
+    - 22
+    - 24
+    - 26
+    - 28
+    - 30
+    - 31
+    - 32
+    - 34
+    - 36
+    - 38
+    - 40
+    - 42
+    - 44
+    - 47
+    - 50
+
+board:
+  y: 5.0
+  origin:
+    x: 1
+    z: 1
+  tile-size: 3
+  tile-step: 4
+  center:
+    x: 18.5
+    y: 5.0
+    z: 18.5
+  center-box:
+    width: 13.5
+    height: 0.5
+    depth: 13.5
+  properties:
+    - { model-id: 10100, name: "봉화", landmark: "봉화군청", festival: "은어축제", author: "monun" }
+    - { model-id: 12600, name: "영덕", landmark: "대게", festival: "대게축제", author: "adfgdfg" }
+    - { model-id: 12400, name: "의성", landmark: "숭의문", festival: "슈퍼푸드마늘축제", author: "adfgdfg" }
+    - { model-id: 11400, name: "임실", landmark: "치즈", festival: "N치즈축제", author: "app6460" }
+    - { model-id: 10000, name: "안동", landmark: "하회탈", festival: "국제탈춤페스티벌", author: "adfgdfg" }
+    - { model-id: 11902, name: "평창", landmark: "팔각구층석탑", festival: "백일홍축제", author: "jhhan611" }
+    - { model-id: 11301, name: "횡성", landmark: "한우동상", festival: "한우축제", author: "sgkill6" }
+    - { model-id: 12300, name: "태백", landmark: "강원랜드", festival: "태백산눈축제", author: "adfgdfg" }
+    - { model-id: 10800, name: "동해", landmark: "바다열차", festival: "무릉제", author: "zlfn" }
+    - { model-id: 11700, name: "나주", landmark: "배", festival: "마한문화축제", author: "degree2121" }
+    - { model-id: 10501, name: "춘천", landmark: "소양강스카이워크", festival: "마임축제", author: "pumkins2" }
+    - { model-id: 11200, name: "경주", landmark: "황룡사9층목탑", festival: "신라문화제", author: "adfgdfg" }
+    - { model-id: 11800, name: "포항", landmark: "상생의손", festival: "국제불빛축제", author: "adfgdfg" }
+    - { model-id: 12201, name: "속초", landmark: "영금정", festival: "해맞이축제", author: "coroskai" }
+    - { model-id: 10701, name: "당진", landmark: "왜목마을", festival: "기지시줄다리기축제", author: "piese1028" }
+    - { model-id: 11600, name: "제주", landmark: "슈슉", festival: "들불축제", author: "menil" }
+    - { model-id: 11000, name: "김포", landmark: "김포공항", festival: "평화축제", author: "pparru" }
+    - { model-id: 10400, name: "창원", landmark: "벚꽃열차", festival: "진해군항제", author: "ikmyung" }
+    - { model-id: 12000, name: "세종", landmark: "밀마루전망타워", festival: "세종축제", author: "adfgdfg" }
+    - { model-id: 11500, name: "인천", landmark: "인천국제공항", festival: "송도불빛축제", author: "degree2121" }
+    - { model-id: 10601, name: "대전", landmark: "대동하늘공원", festival: "사이언스페스티벌", author: "jjoa" }
+    - { model-id: 10301, name: "부산", landmark: "광안대교", festival: "불꽃축제", author: "piese1028" }
+    - { model-id: 12100, name: "서울", landmark: "광화문", festival: "벚꽃축제", author: "megat88" }
+  specials:
+    - { model-id: 0, name: "출발지", author: "[null]" }
+    - { model-id: 1005, name: "카지노", author: "piese1028" }
+    - { model-id: 1001, name: "감옥", author: "kinglee2005" }
+    - { model-id: 1006, name: "마법", author: "degree2121" }
+    - { model-id: 1002, name: "축제", author: "coroskai" }
+    - { model-id: 1007, name: "마법", author: "degree2121" }
+    - { model-id: 1003, name: "포탈", author: "degree2121" }
+    - { model-id: 1008, name: "마법", author: "degree2121" }
+    - { model-id: 1004, name: "국세청", author: "piese1028" }

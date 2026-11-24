@@ -6,10 +6,6 @@ import io.github.monun.speculation.game.event.PieceJailbreakEvent
 import io.github.monun.speculation.game.exception.PieceTurnOverException
 
 class ZoneJail : Zone() {
-    companion object {
-        const val count = 3
-    }
-
     override suspend fun onTryLeave(piece: Piece, diceResult: List<Int>) {
         if (piece.jailCount > 0) {
             val value = diceResult.first()
@@ -28,7 +24,7 @@ class ZoneJail : Zone() {
     }
 
     override suspend fun onArrive(journey: Journey) {
-        journey.piece.jailCount = count
+        journey.piece.jailCount = board.game.rules.jailTurns
         throw PieceTurnOverException()
     }
 

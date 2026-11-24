@@ -18,9 +18,9 @@ class Piece(board: Board, val name: String, zone: Zone) : Attachable() {
     val hasTurn: Boolean
         get() = board.game.currentTurn === this
 
-    var numberOfDice = 2
+    var numberOfDice = board.game.rules.defaultDiceCount
 
-    var balance = 400
+    var balance = board.game.rules.startingBalance
         private set
 
     var hasAngel = false

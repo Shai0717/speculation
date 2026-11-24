@@ -23,8 +23,7 @@ class PaperGameListener(
                 piece.player = player
             }
             process.dialogDispatcher.currentDialog?.timeout?.showProgressBar(listOf(player))
-            process.fakeEntityServer.addPlayer(player)
-            player.setSpeculationResourcePack()
+            player.setSpeculationResourcePack(process.plugin)
         }
     }
 

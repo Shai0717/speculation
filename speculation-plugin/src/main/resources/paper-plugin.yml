@@ -1,0 +1,12 @@
+name: ${pluginName}
+version: ${version}
+main: ${group}.${packageName}.plugin.${pluginName}Plugin
+api-version: '26.3'
+dependencies:
+  server:
+    Kolor:
+      load: BEFORE
+      required: true
+      join-classpath: true
+libraries:
+  - org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2

@@ -1,12 +1,8 @@
 package io.github.monun.speculation.paper
 
-import io.github.monun.heartbeat.coroutines.Heartbeat
 import io.github.monun.speculation.game.dialog.GameDialogTax
 import io.github.monun.speculation.paper.util.playSound
-import io.github.monun.tap.fake.FakeEntity
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -14,11 +10,12 @@ import net.kyori.adventure.title.Title
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Sound
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
+import org.bukkit.entity.TextDisplay
 import org.bukkit.util.BoundingBox
 import org.bukkit.util.Vector
 import java.time.Duration
+import java.util.logging.Level
 import kotlin.math.roundToInt
 
 class Dialog(val piece: PaperPiece) {
@@ -116,7 +113,7 @@ class Dialog(val piece: PaperPiece) {
                     Title.title(
                         Component.empty(),
                         message,
-                        Title.Times.of(Duration.ofMillis(0), Duration.ofSeconds(1), Duration.ofMillis(100))
+                        Title.Times.times(Duration.ofMillis(0), Duration.ofSeconds(1), Duration.ofMillis(100))
                     )
                 )
             }
@@ -153,7 +150,7 @@ class Dialog(val piece: PaperPiece) {
 
         var actionMessage: (() -> Component)? = null
             private set
-        private var display: FakeEntity? = null
+        private val displays = arrayListOf<TextDisplay>()
         private var onClick: ((Player, Dialog, Button) -> Unit)? = null
 
         fun actionMessage(actionMessage: () -> Component) {
@@ -162,12 +159,16 @@ class Dialog(val piece: PaperPiece) {
         }
 
         fun display(location: Location, text: Component) {
-            display = piece.process.fakeEntityServer.spawnEntity(location, ArmorStand::class.java).apply {
-                updateMetadata<ArmorStand> {
-                    isMarker = true
-                    isInvisible = true
-                    isCustomNameVisible = true
-                    customName(text)
+            if (isDisposed) return
+
+            val plugin = piece.process.plugin
+            plugin.kolorDisplay.text(location, text).whenComplete { entity, exception ->
+                if (exception != null) {
+                    plugin.logger.log(Level.WARNING, "Could not create dialog text display", exception)
+                } else if (isDisposed) {
+                    plugin.kolorDisplay.remove(entity)
+                } else {
+                    displays += entity
                 }
             }
         }
@@ -184,7 +185,8 @@ class Dialog(val piece: PaperPiece) {
             if (isDisposed) return
 
             isDisposed = true
-            display?.remove()
+            displays.forEach { piece.process.plugin.kolorDisplay.remove(it) }
+            displays.clear()
         }
     }
 

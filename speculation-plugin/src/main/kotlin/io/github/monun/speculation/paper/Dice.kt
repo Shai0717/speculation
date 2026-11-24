@@ -1,9 +1,6 @@
 package io.github.monun.speculation.paper
 
 import io.github.monun.speculation.paper.util.playSound
-import io.github.monun.tap.fake.FakeEntity
-import io.github.monun.tap.fake.FakeEntityServer
-import io.github.monun.tap.math.toRadians
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Sound
@@ -14,7 +11,7 @@ import org.bukkit.util.Vector
 import kotlin.math.round
 import kotlin.random.Random
 
-class Dice(fakeEntityServer: FakeEntityServer, loc: Location) {
+class Dice(entityRegistry: GameEntityRegistry, loc: Location, private val boardY: Double) {
     companion object {
         const val stateBeforeRoll = 0
         const val stateRolling = 1
@@ -44,19 +41,16 @@ class Dice(fakeEntityServer: FakeEntityServer, loc: Location) {
         }
     }
 
-    private val stand: FakeEntity = fakeEntityServer.spawnEntity(loc, ArmorStand::class.java).apply {
-        updateMetadata<ArmorStand> {
-            headPose = EulerAngle.ZERO
-            isInvisible = true
-            isMarker = true
-        }
-        updateEquipment {
-            setHelmet(ItemStack(Material.PAPER).apply {
-                editMeta {
-                    it.setCustomModelData(1000)
-                }
-            }, true)
-        }
+    private val stand: ArmorStand = entityRegistry.spawn(loc, ArmorStand::class.java).apply {
+        headPose = EulerAngle.ZERO
+        isInvisible = true
+        isMarker = true
+        setGravity(false)
+        equipment.setHelmet(ItemStack(Material.PAPER).apply {
+            editMeta {
+                it.setCustomModelData(1000)
+            }
+        }, true)
     }
 
     var owner: Pair<PaperPiece, Vector>? = null
@@ -102,18 +96,19 @@ class Dice(fakeEntityServer: FakeEntityServer, loc: Location) {
                     x = location.x
                     y = location.y
                     z = location.z
-                    add(offset.clone().rotateAroundY(-location.yaw.toDouble().toRadians()))
+                    add(offset.clone().rotateAroundY(Math.toRadians(-location.yaw.toDouble())))
                 }
             }
             stateRolling -> {
                 velocity.y -= 0.15
                 location.add(velocity)
-                stand.updateMetadata<ArmorStand> {
-                    headPose =
-                        headPose.add(rotation.x * rotationSpeed, rotation.y * rotationSpeed, rotation.z * rotationSpeed)
-                }
+                stand.headPose = stand.headPose.add(
+                    rotation.x * rotationSpeed,
+                    rotation.y * rotationSpeed,
+                    rotation.z * rotationSpeed
+                )
 
-                if (location.y < PaperGameConfig.boardY) {
+                if (location.y < boardY) {
                     val speed = velocity.length()
 
                     if (speed > 0.2) {
@@ -126,27 +121,25 @@ class Dice(fakeEntityServer: FakeEntityServer, loc: Location) {
                         }
                     } else {
                         state = stateOnGround
-                        location.y = PaperGameConfig.boardY
-                        stand.updateMetadata<ArmorStand> {
-                            val headPose = this.headPose
-                            val ra = 90.0.toRadians()
-                            val x = headPose.x / ra
-                            val z = headPose.z / ra
+                        location.y = boardY
+                        val headPose = stand.headPose
+                        val ra = Math.toRadians(90.0)
+                        val x = headPose.x / ra
+                        val z = headPose.z / ra
 
-                            val newAngle = EulerAngle(
-                                round(x) * ra,
-                                headPose.y,
-                                round(z) * ra
-                            )
-                            value = calculateDiceValue(newAngle).number
-                            this.headPose = newAngle
-                        }
+                        val newAngle = EulerAngle(
+                            round(x) * ra,
+                            headPose.y,
+                            round(z) * ra
+                        )
+                        value = calculateDiceValue(newAngle).number
+                        stand.headPose = newAngle
                     }
                 }
             }
         }
 
-        stand.moveTo(location)
+        stand.teleport(location)
     }
 
     fun remove(ticks: Int) {

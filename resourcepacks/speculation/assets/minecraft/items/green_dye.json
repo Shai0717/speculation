@@ -1,0 +1,426 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "minecraft:custom_model_data",
+    "index": 0,
+    "entries": [
+      {
+        "threshold": 1000,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/element/monun/flag_green"
+        }
+      },
+      {
+        "threshold": 1001,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/element/monun/villa_green"
+        }
+      },
+      {
+        "threshold": 1002,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/element/monun/building_green"
+        }
+      },
+      {
+        "threshold": 1003,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/element/monun/hotel_green"
+        }
+      },
+      {
+        "threshold": 10000,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/andong/adfgdfg/green"
+        }
+      },
+      {
+        "threshold": 10001,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/andong/degree2121/green"
+        }
+      },
+      {
+        "threshold": 10100,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/bonghwa/monun/green"
+        }
+      },
+      {
+        "threshold": 10200,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/boryeong/traloc_dheckoa/green"
+        }
+      },
+      {
+        "threshold": 10300,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/busan/ghkdgnl/green"
+        }
+      },
+      {
+        "threshold": 10301,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/busan/piese1028/green"
+        }
+      },
+      {
+        "threshold": 10400,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/changwon/ikmyung/green"
+        }
+      },
+      {
+        "threshold": 10500,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/chuncheon/information/green"
+        }
+      },
+      {
+        "threshold": 10501,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/chuncheon/pumkins2/green"
+        }
+      },
+      {
+        "threshold": 10502,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/chuncheon/sssndw10/green"
+        }
+      },
+      {
+        "threshold": 10503,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/chuncheon/tenthdoctor/green"
+        }
+      },
+      {
+        "threshold": 10600,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/daejeon/cheonanstn/green"
+        }
+      },
+      {
+        "threshold": 10601,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/daejeon/jjoa/green"
+        }
+      },
+      {
+        "threshold": 10602,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/daejeon/piese1028/green"
+        }
+      },
+      {
+        "threshold": 10700,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/dangjin/kde0607/green"
+        }
+      },
+      {
+        "threshold": 10701,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/dangjin/piese1028/green"
+        }
+      },
+      {
+        "threshold": 10702,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/dangjin/pingu3628/green"
+        }
+      },
+      {
+        "threshold": 10800,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/donghae/zlfn/green"
+        }
+      },
+      {
+        "threshold": 10900,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/ganghwa/hgnb0508/green"
+        }
+      },
+      {
+        "threshold": 11000,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/gimpo/pparru/green"
+        }
+      },
+      {
+        "threshold": 11100,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/gwangju/adfgdfg/green"
+        }
+      },
+      {
+        "threshold": 11200,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/gyeongju/adfgdfg/green"
+        }
+      },
+      {
+        "threshold": 11201,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/gyeongju/jjoa/green"
+        }
+      },
+      {
+        "threshold": 11202,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/gyeongju/jw/green"
+        }
+      },
+      {
+        "threshold": 11300,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/hoengseong/adfgdfg/green"
+        }
+      },
+      {
+        "threshold": 11301,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/hoengseong/sgkill6/green"
+        }
+      },
+      {
+        "threshold": 11400,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/imsil/app6460/green"
+        }
+      },
+      {
+        "threshold": 11500,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/incheon/degree2121/green"
+        }
+      },
+      {
+        "threshold": 11501,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/incheon/ikohistory/green"
+        }
+      },
+      {
+        "threshold": 11600,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/jeju/menil/green"
+        }
+      },
+      {
+        "threshold": 11700,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/naju/degree2121/green"
+        }
+      },
+      {
+        "threshold": 11701,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/naju/moon0907/green"
+        }
+      },
+      {
+        "threshold": 11702,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/naju/pingu3628/green"
+        }
+      },
+      {
+        "threshold": 11800,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/pohang/adfgdfg/green"
+        }
+      },
+      {
+        "threshold": 11801,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/pohang/dytro/green"
+        }
+      },
+      {
+        "threshold": 11900,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/pyeongchang/implan/green"
+        }
+      },
+      {
+        "threshold": 11901,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/pyeongchang/irving_braxiatel/green"
+        }
+      },
+      {
+        "threshold": 11902,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/pyeongchang/jhhan611/green"
+        }
+      },
+      {
+        "threshold": 11903,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/pyeongchang/piggy3590/green"
+        }
+      },
+      {
+        "threshold": 12000,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/sejong/adfgdfg/green"
+        }
+      },
+      {
+        "threshold": 12001,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/sejong/degree2121/green"
+        }
+      },
+      {
+        "threshold": 12100,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/seoul/megat88/green"
+        }
+      },
+      {
+        "threshold": 12101,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/seoul/obinox/green"
+        }
+      },
+      {
+        "threshold": 12200,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/sokcho/chojinwoo/green"
+        }
+      },
+      {
+        "threshold": 12201,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/sokcho/coroskai/green"
+        }
+      },
+      {
+        "threshold": 12300,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/taebaek/adfgdfg/green"
+        }
+      },
+      {
+        "threshold": 12301,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/taebaek/degree2121/green"
+        }
+      },
+      {
+        "threshold": 12400,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/uiseong/adfgdfg/green"
+        }
+      },
+      {
+        "threshold": 12401,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/uiseong/alexjang/green"
+        }
+      },
+      {
+        "threshold": 12500,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/yecheon/pingu3628/green"
+        }
+      },
+      {
+        "threshold": 12600,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/yeongdeok/adfgdfg/green"
+        }
+      },
+      {
+        "threshold": 12601,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/yeongdeok/eso136/green"
+        }
+      },
+      {
+        "threshold": 12602,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/yeongdeok/jangj/green"
+        }
+      },
+      {
+        "threshold": 12603,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/yeongdeok/mdjoon/green"
+        }
+      },
+      {
+        "threshold": 12604,
+        "model": {
+          "type": "minecraft:model",
+          "model": "item/yeongdeok/tbacaf/green"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "minecraft:item/green_dye"
+    }
+  }
+}

@@ -1,7 +1,5 @@
 package io.github.monun.speculation.paper
 
-import io.github.monun.heartbeat.coroutines.Heartbeat
-import io.github.monun.heartbeat.coroutines.Suspension
 import io.github.monun.speculation.game.Piece
 import io.github.monun.speculation.game.dialog.*
 import io.github.monun.speculation.game.message.GameMessage
@@ -9,8 +7,6 @@ import io.github.monun.speculation.game.zone.Magic
 import io.github.monun.speculation.game.zone.Zone
 import io.github.monun.speculation.game.zone.ZoneProperty
 import io.github.monun.speculation.paper.util.playSound
-import io.github.monun.tap.math.toRadians
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -78,12 +74,12 @@ class GameDialogDispatcher {
     }
 
     private suspend fun dice(diceDialog: GameDialogDice): List<Int> {
-        return withContext(Dispatchers.Heartbeat) {
+        return withContext(process.plugin.kolorDispatcher) {
             process.clearDices()
 
             val paperPiece: PaperPiece = diceDialog.piece.attachment()
             val location =
-                paperPiece.player?.location?.apply { y += 2.5 } ?: PaperGameConfig.center.toLocation(process.world)
+                paperPiece.player?.location?.apply { y += 2.5 } ?: process.centerLocation
             val numberOfDice = diceDialog.numberOfDice
             val offset = Vector(0.0, 2.5, 0.0).apply {
                 if (diceDialog.numberOfDice > 1) x = 2.5
@@ -92,7 +88,7 @@ class GameDialogDispatcher {
                 process.spawnDice(
                     location,
                     paperPiece,
-                    offset.clone().rotateAroundY((360.0 / numberOfDice).toRadians() * it)
+                    offset.clone().rotateAroundY(Math.toRadians(360.0 / numberOfDice) * it)
                 )
             }
 
@@ -100,7 +96,7 @@ class GameDialogDispatcher {
                 message {
                     Component.text("보드를 클릭해 주사위를 굴리세요!")
                 }
-                button(PaperGameConfig.centerBox) {
+                button(process.settings.centerBox) {
                     onClick { player, _, _ ->
                         val velocity = player.location.direction
                         dices.forEach { dice ->
@@ -117,8 +113,6 @@ class GameDialogDispatcher {
                 }
             }
 
-            val sus = Suspension()
-
             while (isActive) {
                 val player = paperPiece.player
 
@@ -128,7 +122,7 @@ class GameDialogDispatcher {
                 }
                 // 모든 주사위가 완료되면 탈출
                 if (dices.all { it.isOnGround }) break
-                sus.delay(50L)
+                delay(50L)
             }
 
             dices.forEach { it.remove(60) }
@@ -148,10 +142,10 @@ class GameDialogDispatcher {
                 Title.title(
                     title.build(),
                     paperPiece.name,
-                    Title.Times.of(Duration.ofMillis(200), Duration.ofSeconds(3), Duration.ofMillis(200))
+                    Title.Times.times(Duration.ofMillis(200), Duration.ofSeconds(3), Duration.ofMillis(200))
                 )
             )
-            sus.delay(1000L)
+            delay(1000L)
             dices.map { it.value }
         }
     }
@@ -165,7 +159,7 @@ class GameDialogDispatcher {
         val paperProperty = property.attachment<PaperZoneProperty>()
         val channel = Channel<Boolean>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             if (paperPiece.player == null) {
                 channel.trySend(false)
                 return@withContext
@@ -202,7 +196,7 @@ class GameDialogDispatcher {
                         disposeCurrentDialog()
                     }
                 }
-                button(PaperGameConfig.centerBox) {
+                button(process.settings.centerBox) {
                     actionMessage {
                         Component.text("취소").color(NamedTextColor.RED)
                     }
@@ -228,7 +222,7 @@ class GameDialogDispatcher {
         val paperProperty = property.attachment<PaperZoneProperty>()
         val channel = Channel<Boolean>()
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             if (paperPiece.player == null) {
                 channel.trySend(false)
                 return@withContext
@@ -253,7 +247,7 @@ class GameDialogDispatcher {
                         disposeCurrentDialog()
                     }
                 }
-                button(PaperGameConfig.centerBox) {
+                button(process.settings.centerBox) {
                     actionMessage {
                         Component.text("취소")
                     }
@@ -279,7 +273,7 @@ class GameDialogDispatcher {
 
         val required = seizureDialog.requiredAmount
 
-        return withContext(Dispatchers.Heartbeat) {
+        return withContext(process.plugin.kolorDispatcher) {
             val defaultSelected = seizureDialog.default()
             val selected = mutableSetOf<PaperZoneProperty>()
             var confirm = false
@@ -303,7 +297,7 @@ class GameDialogDispatcher {
                 for (paperProperty in paperProperties) {
                     button(paperProperty.box) {
                         display(
-                            paperProperty.tollsTag.location.apply { y -= 0.25 },
+                            paperProperty.tollsTagLocation.clone().apply { y -= 0.25 },
                             Component.text("매각금액: ${paperProperty.zone.assets}").color(NamedTextColor.RED)
                         )
 
@@ -336,7 +330,7 @@ class GameDialogDispatcher {
                     }
                 }
 
-                button(PaperGameConfig.centerBox) {
+                button(process.settings.centerBox) {
                     actionMessage {
                         val listString = buildString {
                             defaultSelected.forEach {
@@ -388,7 +382,7 @@ class GameDialogDispatcher {
         val max = bettingDialog.max
         val piece = bettingDialog.piece
 
-        return withContext(Dispatchers.Heartbeat) {
+        return withContext(process.plugin.kolorDispatcher) {
             val channel = Channel<Int>()
 
             newDialog(piece) {
@@ -404,7 +398,7 @@ class GameDialogDispatcher {
                         disposeCurrentDialog()
                     }
                 }
-                button(PaperGameConfig.centerBox) {
+                button(process.settings.centerBox) {
                     actionMessage {
                         Component.text("취소")
                     }
@@ -427,7 +421,7 @@ class GameDialogDispatcher {
         val magics = magicDialog.magics
         val paperPiece = magicDialog.piece.attachment<PaperPiece>()
 
-        return withContext(Dispatchers.Heartbeat) {
+        return withContext(process.plugin.kolorDispatcher) {
             val loc = paperPiece.stand.location
             val infoMap = magics.associateWith {
                 when(it) {
@@ -453,7 +447,7 @@ class GameDialogDispatcher {
             var stop = false
 
             newDialog(magicDialog.piece) {
-                button(PaperGameConfig.centerBox) {
+                button(process.settings.centerBox) {
                     onClick { _, _, _ ->
                         stop = true
                         disposeCurrentDialog()
@@ -472,7 +466,7 @@ class GameDialogDispatcher {
                     Title.title(
                         Component.text(info.first).color(NamedTextColor.GOLD),
                         Component.text("보드를 클릭하여 마법을 선택하세요"),
-                        Title.Times.of(
+                        Title.Times.times(
                             Duration.ofMillis(0),
                             Duration.ofSeconds(1),
                             Duration.ofMillis(250)
@@ -491,7 +485,7 @@ class GameDialogDispatcher {
                 Title.title(
                     Component.text(info.first).color(NamedTextColor.GOLD),
                     Component.text(info.second),
-                    Title.Times.of(
+                    Title.Times.times(
                         Duration.ofMillis(0),
                         Duration.ofSeconds(2),
                         Duration.ofMillis(250)
@@ -510,7 +504,7 @@ class GameDialogDispatcher {
         val channel = Channel<Zone>()
         val messageText = messageOf(targetZoneDialog.message)
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             newDialog(piece) {
                 message {
                     Component.text(messageText.first)
@@ -541,7 +535,7 @@ class GameDialogDispatcher {
         val channel = Channel<Piece>()
         val messageText = messageOf(targetPieceDialog.message)
 
-        withContext(Dispatchers.Heartbeat) {
+        withContext(process.plugin.kolorDispatcher) {
             newDialog(piece) {
                 message {
                     Component.text(messageText.first)
@@ -549,7 +543,7 @@ class GameDialogDispatcher {
                 for (target in targetPieceDialog.candidates) {
                     val paperPiece = target.attachment<PaperPiece>()
 
-                    button(paperPiece.stand.bukkitEntity.boundingBox.expand(0.5)) {
+                    button(paperPiece.stand.boundingBox.expand(0.5)) {
                         actionMessage { paperPiece.name }
 
                         onClick { _, _, _ ->
@@ -592,7 +586,7 @@ class GameDialogDispatcher {
         val zone = taxDialog.zone
         val paperZone = zone.attachment<PaperZoneNTS>()
 
-        return withContext(Dispatchers.Heartbeat) {
+        return withContext(process.plugin.kolorDispatcher) {
             val location = paperPiece.stand.location
             var value = taxDialog.max.toDouble()
             var speed = 0.0
@@ -622,7 +616,7 @@ class GameDialogDispatcher {
                     Title.title(
                         Component.text(amount).color(NamedTextColor.DARK_GREEN).decorate(TextDecoration.BOLD),
                         Component.text("국세청을 클릭하여 납부액을 결정하세요"),
-                        Title.Times.of(
+                        Title.Times.times(
                             Duration.ofMillis(0),
                             Duration.ofSeconds(1),
                             Duration.ofMillis(250)
@@ -649,7 +643,7 @@ class GameDialogDispatcher {
                 Title.title(
                     Component.text(amount).color(NamedTextColor.DARK_GREEN).decorate(TextDecoration.BOLD),
                     Component.empty(),
-                    Title.Times.of(
+                    Title.Times.times(
                         Duration.ofMillis(0),
                         Duration.ofSeconds(2),
                         Duration.ofMillis(250)

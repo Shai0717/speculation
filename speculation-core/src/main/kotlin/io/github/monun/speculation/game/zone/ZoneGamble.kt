@@ -17,7 +17,8 @@ class ZoneGamble : Zone() {
         val piece = journey.piece
         if (piece.balance <= 0) return
 
-        val maxBetting = min(50 + (visitCount - 1) * 10, piece.balance)
+        val rules = board.game.rules
+        val maxBetting = min(rules.gambleBaseBet + (visitCount - 1) * rules.gambleBetIncrement, piece.balance)
         var betting = piece.request(GameDialogBetting(maxBetting), GameMessage.BETTING) { 0 }
 
         if (betting > 0) {
@@ -31,7 +32,9 @@ class ZoneGamble : Zone() {
             board.game.eventAdapter.call(PieceGambleStartEvent(piece, betting, gamblers))
 
             val results = gamblers.associateWith { gambler ->
-                gambler.request(GameDialogDice(3), GameMessage.ROLL_THE_DICE_FOR_GAMBLE) { List(3) { 1 } }.sum()
+                gambler.request(GameDialogDice(rules.gambleDiceCount), GameMessage.ROLL_THE_DICE_FOR_GAMBLE) {
+                    List(rules.gambleDiceCount) { 1 }
+                }.sum()
             }
 
             val maxValue = results.maxOf { it.value }

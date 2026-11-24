@@ -35,7 +35,7 @@ class PaperZoneStart(override val zone: ZoneStart) : PaperZoneSpecial() {
         location.run {
             y += 1.0
             playSound(Sound.ENTITY_PLAYER_LEVELUP, 2.0F)
-            world.spawnParticle(Particle.TOTEM, this, 16, 0.5, 0.5, 0.5, 0.2, null, true)
+            world.spawnParticle(Particle.TOTEM_OF_UNDYING, this, 16, 0.5, 0.5, 0.5, 0.2, null, true)
         }
     }
 }

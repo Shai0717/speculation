@@ -1,18 +1,18 @@
 val core = project(":${rootProject.name}-core")
 
 repositories {
-    maven("https://papermc.io/repo/repository/maven-public/")
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
     implementation(core)
-    implementation("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
-    implementation("io.github.monun:heartbeat-coroutines:0.0.1")
-    implementation("io.github.monun:tap-api:4.1.10")
-    implementation("io.github.monun:kommand-api:2.6.6")
+    compileOnly("io.github.Shai0717:Kolor:1.0.0")
+    compileOnly("io.papermc.paper:paper-api:26.3.build.26-alpha")
 }
 
-val pluginName = rootProject.name.split('-').joinToString("") { it.capitalize() }
+val pluginName = rootProject.name.split('-').joinToString("") { name ->
+    name.replaceFirstChar { it.uppercase() }
+}
 val packageName = rootProject.name.replace("-", "")
 extra.set("pluginName", pluginName)
 extra.set("packageName", packageName)
@@ -25,22 +25,19 @@ tasks {
         }
     }
 
-    create<Jar>("paperJar") {
+    val paperJar = register<Jar>("paperJar") {
+        dependsOn(project.tasks.getByName("classes"), core.tasks.getByName("classes"))
         archiveBaseName.set(pluginName)
         archiveVersion.set("")
+        archiveFileName.set("$pluginName.jar")
+        destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
 
         (listOf(project, core) + core.subprojects).forEach {
             from(it.sourceSets["main"].output)
         }
+    }
 
-        doLast {
-            copy {
-                from(archiveFile)
-                val plugins = File(rootDir, ".debug/plugins/")
-                val runPlugins = File(rootDir, "run/plugins/")
-                into(if (File(plugins, archiveFileName.get()).exists()) File(plugins, "update") else plugins)
-                into(runPlugins)
-            }
-        }
+    named("assemble") {
+        dependsOn(paperJar)
     }
 }

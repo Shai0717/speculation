@@ -3,18 +3,19 @@ package io.github.monun.speculation.paper
 import io.github.monun.speculation.game.zone.ZoneProperty
 import io.github.monun.speculation.paper.util.broadcast
 import io.github.monun.speculation.paper.util.playSound
-import io.github.monun.tap.effect.playFirework
-import io.github.monun.tap.fake.FakeEntity
+import io.github.monun.speculation.paper.util.playFirework
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Color
 import org.bukkit.FireworkEffect
+import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.Sound
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Firework
 import org.bukkit.entity.ItemFrame
+import org.bukkit.entity.TextDisplay
 import org.bukkit.inventory.ItemStack
+import java.util.concurrent.CompletableFuture
 import kotlin.random.Random
 
 class PaperZoneProperty(
@@ -24,8 +25,9 @@ class PaperZoneProperty(
     lateinit var landmarkName: String
     lateinit var festivalName: String
 
-    lateinit var nameTag: FakeEntity
-    lateinit var tollsTag: FakeEntity
+    lateinit var nameTag: CompletableFuture<TextDisplay>
+    lateinit var tollsTag: CompletableFuture<TextDisplay>
+    lateinit var tollsTagLocation: Location
 
     lateinit var slotLeft: ItemFrame
     lateinit var slotCenter: ItemFrame
@@ -43,7 +45,7 @@ class PaperZoneProperty(
             val widthZ = box.widthZ
             val world = process.world
             world.spawnParticle(
-                Particle.VILLAGER_HAPPY,
+                Particle.HAPPY_VILLAGER,
                 min.x + Random.nextDouble() * widthX,
                 min.y,
                 min.z + Random.nextDouble() * widthZ,
@@ -53,8 +55,8 @@ class PaperZoneProperty(
     }
 
     override fun destroy() {
-        nameTag.remove()
-        tollsTag.remove()
+        nameTag.thenAccept { process.plugin.kolorDisplay.remove(it) }
+        tollsTag.thenAccept { process.plugin.kolorDisplay.remove(it) }
         slots.forEach { it.remove() }
     }
 
@@ -109,8 +111,11 @@ class PaperZoneProperty(
             Component.text("  (x${amplifier.toString().removeSuffix(".0")})").color(NamedTextColor.GOLD)
         )
 
-        tollsTag.updateMetadata<ArmorStand> {
-            customName(text.build())
+        val component = text.build()
+        tollsTag.thenAccept { display ->
+            process.plugin.kolorDisplay.update(display) {
+                (it as TextDisplay).text(component)
+            }
         }
     }
 
@@ -162,7 +167,7 @@ class PaperZoneProperty(
 
     fun playClearEffect() {
         val effect = FireworkEffect.builder().with(FireworkEffect.Type.BALL_LARGE).withColor(Color.WHITE).build()
-        location.world.playFirework(location, effect, 128.0)
+        location.world.playFirework(location, effect)
     }
 
     fun playSelectionEffect(selected: Boolean) {

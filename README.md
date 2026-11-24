@@ -2,24 +2,39 @@
 
 ### 실행 환경
 
-* java 16+
-* paper 1.17.1
+* Java 25
+* Paper 26.3 (build 26)
 
-### 서버 열기
+### 빌드 및 서버 설치
 
-1. [server.zip](https://github.com/monun/speculation/releases/latest/download/server.zip) 다운로드
-2. 원하는 폴더에 압축 풀기
-3. 서버 실행
-   * windows -> run-windows.bat 실행
-   * linux -> ./run-linux.sh
-4. 서버 접속
-5. 팀 선택 `/team join <team> <player>`
-6. 게임 시작 `/speculation start <world> <players> <teamMatch>`
+1. 빌드 시 Gradle composite build가 `Speculation`의 형제 폴더 `Kolor`를 참조하므로 두 소스 폴더를 나란히 둔 Java 25 환경에서 `.\gradlew.bat build` 실행
+2. Kolor 프레임워크를 먼저 Paper 26.3 서버의 `plugins` 폴더에 설치
+3. `build/libs/Speculation.jar`를 같은 서버의 `plugins` 폴더에 복사
+4. 서버를 시작한 뒤 게임에서 팀 선택 `/team join <team> <player>`
+5. 게임 시작 `/speculation start <world> <players> <teamMatch>`
     * 예) 개인매치 - `/speculation start world @a false`
     * 예) 그룹매치 - `/speculation start world @a true`
 
+### 리소스팩 배포
+
+1. `.\gradlew.bat resourcepacksZip`을 실행해 `build/libs/resourcepack.zip`을 생성합니다. 명령 출력에 SHA-1 값이 표시됩니다.
+2. ZIP 파일을 공개 HTTPS 주소에 올리고 서버에서 해당 주소를 받을 수 있는지 확인합니다.
+3. 서버를 한 번 실행한 뒤 생성된 `plugins/Speculation/config.yml`의 `resource-pack.url`에 ZIP 주소, `resource-pack.sha1`에 빌드 출력의 SHA-1 값을 설정합니다.
+4. 서버를 재시작한 뒤 `/speculation resourcepack`으로 적용합니다.
+
 - 선택) 리소스팩 - `/speculation resourcepack`
   - 로컬에서 리소스팩을 미리 적용 시키지 않았다면 서버 접속 이전에 "서버 리소스팩" 설정을 허용으로 변경하시는 것을 권장합니다.
+
+### Kolor 및 설정
+
+- Speculation은 Kolor 프레임워크에 의존하므로 Kolor 플러그인을 함께 설치해야 합니다. Kolor가 없으면 서버에서 Speculation을 로드하지 않습니다.
+- Kolor 호환성 계층에는 Tap의 패킷 전용 가짜 ArmorStand/아이템 기능이 없으므로, 게임 말과 효과 아이템은 추적·정리되는 비영속 Bukkit 엔티티로 표시됩니다. 이 엔티티들은 서버의 다른 플러그인에도 보일 수 있습니다.
+- 게임 로직의 코루틴 실행·지연은 Kolor 전역 스케줄러를 사용합니다. `delay`는 50ms 단위의 서버 틱으로 올림 처리되어 서버가 느려지면 실제 대기 시간도 길어집니다.
+- `speculation-core`는 독립적인 게임 규칙 계층으로 유지하고, Paper/Kolor 연동은 `speculation-plugin`에서 처리합니다. 부동 텍스트와 보드 부동산 표시는 Kolor `KolorDisplay`를 사용하며, 게임 말의 ArmorStand와 ItemFrame처럼 Kolor 표시 API가 다루지 않는 게임 엔티티는 Paper API를 사용합니다.
+- Kolor 자체는 Folia 스케줄러를 지원하지만, 이 게임 플러그인의 보드/게임 루프는 아직 전역 Paper 실행 모델을 사용합니다. Folia 호환 플러그인이라고 선언하거나 보장하지 않습니다.
+- `config.yml`에서 명령어 권한, 시작 대기 시간, 시작 잔액/보상, 주사위 수, 감옥 턴, 카지노 베팅, 부동산 통행료, 보드 위치/크기, 리소스팩 및 보드 표시 이름/모델 ID를 설정할 수 있습니다.
+- 부동산 표시 설정은 보드 순서대로 23개, 특수 칸 표시는 9개 항목을 유지해야 합니다. 값이 잘못되거나 항목 수가 맞지 않으면 플러그인이 잘못된 설정을 명시하고 로드를 중단합니다.
+- 설정 변경은 서버 재시작 후 적용됩니다.
 
 --- 
 

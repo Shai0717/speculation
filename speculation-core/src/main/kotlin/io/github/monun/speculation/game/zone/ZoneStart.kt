@@ -7,13 +7,13 @@ class ZoneStart : Zone() {
         val piece = journey.piece
 
         piece.level++
-        piece.deposit(100, this)
+        piece.deposit(board.game.rules.startPassReward, this)
     }
 
     override suspend fun onArrive(journey: Journey) {
         val piece = journey.piece
 
         piece.level++
-        piece.deposit(200, this)
+        piece.deposit(board.game.rules.startArrivalReward, this)
     }
 }
