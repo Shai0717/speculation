@@ -15,6 +15,10 @@
     * 예) 개인매치 - `/speculation start world @a false`
     * 예) 그룹매치 - `/speculation start world @a true`
 
+### 포함된 서버 실행
+
+`run` 폴더에는 Paper 26.3 build 26과 Speculation 및 Kolor 플러그인이 포함되어 있습니다. Java 25를 설치한 뒤 `run` 폴더에서 Windows는 `run-windows.bat`, Linux는 `bash run-linux.sh`로 시작합니다. 최초 실행 시 생성되는 `eula.txt`의 내용을 확인하고 동의한 경우에만 `eula=true`로 설정한 뒤 다시 시작하세요. 기존 월드는 새 버전에서 변환될 수 있으므로 실행 전에 백업하세요.
+
 ### 리소스팩 배포
 
 1. `.\gradlew.bat resourcepacksZip`을 실행해 `build/libs/resourcepack.zip`을 생성합니다. 명령 출력에 SHA-1 값이 표시됩니다.

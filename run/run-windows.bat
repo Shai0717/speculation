@@ -1,2 +1,4 @@
-java -jar -Xmx4G -Xms4G paper-1.17.1-401.jar --nogui
+@echo off
+cd /d "%~dp0"
+java -Xmx4G -Xms4G -jar paper-26.3-26.jar --nogui
 pause

@@ -86,7 +86,6 @@ EOT
     "-XX:MaxTenuringThreshold=1"
     "-Dusing.aikars.flags=https://mcflags.emc.gs"
     "-Daikars.new.flags=true"
-    "-Dcom.mojang.eula.agree=true"
   )
 
   if [[ $memory -lt 12 ]]; then
